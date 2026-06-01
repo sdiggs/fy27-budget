@@ -1,0 +1,567 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Four Ways to Read the FY2027 Budget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  :root{
+    --ink:#222; --ink2:#555; --ink3:#888; --rule:#e2e2e2; --rule2:#d6d6d6;
+    --tabbg:#f4f4f4; --tabon:#fff; --redtxt:#b0402c; --greentxt:#5f8a47;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#fff;color:var(--ink);
+    font-family:"Libre Franklin",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 30px 80px}
+  .meta{font-size:11px;letter-spacing:.04em;color:var(--ink3);text-transform:uppercase}
+  .meta b{color:var(--redtxt);font-weight:600}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(28px,4.6vw,46px);
+     line-height:1.05;margin:6px 0 6px;letter-spacing:-.005em}
+  .lede{font-family:Georgia,serif;font-size:clamp(15px,2vw,19px);color:var(--ink);margin:0 0 18px}
+  .toprule{border:0;border-top:1px solid var(--rule);margin:0 0 16px}
+
+  .bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .tabs{display:inline-flex;border:1px solid var(--rule2);border-radius:7px;overflow:hidden;background:var(--tabbg)}
+  .tabs button{appearance:none;border:0;background:transparent;color:var(--ink3);
+    font-family:inherit;font-size:15px;font-weight:500;padding:11px 20px;cursor:pointer;transition:.12s}
+  .tabs button+button{border-left:1px solid var(--rule2)}
+  .tabs button.on{background:var(--tabon);color:var(--ink);font-weight:600;
+    box-shadow:inset 0 0 0 1px var(--rule2),0 1px 2px rgba(0,0,0,.04)}
+  .tabs button:hover:not(.on){color:var(--ink)}
+  .fbar{display:inline-flex;border:1px solid var(--rule2);border-radius:6px;overflow:hidden}
+  .fbar button{appearance:none;border:0;background:#fff;color:var(--ink3);font-family:inherit;
+    font-size:13px;font-weight:500;padding:8px 14px;cursor:pointer}
+  .fbar button+button{border-left:1px solid var(--rule2)}
+  .fbar button.on{background:#efefef;color:var(--ink);font-weight:600}
+
+  .panel{display:flex;gap:30px;align-items:flex-start;margin-top:14px}
+  .panel.full .rail{display:none}
+  .rail{flex:0 0 252px;padding-top:8px}
+  .rail h3{font-size:19px;font-weight:700;margin:0 0 8px;line-height:1.15}
+  .rail p{font-size:13.5px;line-height:1.5;color:var(--ink2);margin:0 0 18px}
+  .key-h{font-size:13px;font-weight:600;color:var(--ink2);margin:0 0 6px}
+  .sizekey{margin:2px 0 20px}
+  .ramp-wrap{margin-top:4px}
+  .ramp{height:13px;border-radius:2px;display:flex;overflow:hidden;border:1px solid #ddd}
+  .ramp i{flex:1}
+  .ramp-ticks{position:relative;height:16px;font-size:10.5px;color:var(--ink3);margin-top:3px}
+  .ramp-ticks span{position:absolute;transform:translateX(-50%)}
+  .legrow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);margin:4px 0}
+  .legrow .dot{width:13px;height:13px;border-radius:50%;display:inline-block}
+
+  .stage{flex:1 1 auto;min-width:0}
+  .deptnote{font-size:13.5px;color:var(--ink2);line-height:1.5;margin:0 0 6px;display:none}
+  .panel.full .deptnote{display:block}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .anno{font-family:Georgia,serif;font-style:italic;font-size:14px;fill:var(--ink3)}
+  .gridline{stroke:#ededed;stroke-width:1}
+  .gridline.zero{stroke:#cfcfcf}
+  .gridlab{font-size:11px;fill:var(--ink3)}
+  .blab{font-weight:600;pointer-events:none;letter-spacing:.005em}
+  .panlab-v{font-weight:700;fill:var(--ink);font-size:13px}
+  .panlab-n{fill:var(--ink3);font-size:11.5px}
+  circle.bub{cursor:pointer;stroke:rgba(0,0,0,.06);stroke-width:.5}
+  circle.bub:hover{stroke:#444;stroke-width:1.5}
+
+  .tip{position:fixed;z-index:50;pointer-events:none;opacity:0;transition:opacity .1s;
+    max-width:280px;background:#fff;border:1px solid #d9d9d9;border-radius:5px;
+    padding:13px 16px;box-shadow:0 6px 22px rgba(0,0,0,.16);text-align:center}
+  .tip .th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+  .tip .thr{height:1px;background:#e3e3e3;margin:7px auto;width:60%}
+  .tip .tn{font-size:16px;font-weight:600;line-height:1.18;margin-bottom:2px}
+  .tip .tsub{font-family:Georgia,serif;font-style:italic;font-size:12.5px;color:var(--ink3);margin-bottom:8px}
+  .tip .tbig{font-size:19px;font-weight:700}
+  .tip .tpct{font-weight:700}
+  .tip .tpct.up{color:var(--greentxt)} .tip .tpct.down{color:var(--redtxt)}
+  .tip .tnote{margin-top:9px;padding-top:8px;border-top:1px solid #ececec;
+    font-size:12px;color:var(--ink2);line-height:1.4;text-align:left}
+  .tip .tnote b{display:block;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+
+  footer{margin-top:34px;border-top:1px solid var(--rule);padding-top:14px;
+    font-size:12px;color:var(--ink3);line-height:1.6;max-width:88ch}
+  footer b{color:var(--ink2)}
+  @media (max-width:760px){.panel{flex-direction:column}.rail{flex:auto;width:100%}}
+</style>
+
+<div class="wrap">
+  <div class="meta"><b>Proposal</b> · Office of Management and Budget · Fiscal Year 2027</div>
+  <h1>Four Ways to Read the FY2027 Budget</h1>
+  <p class="lede">Explore the President's 2027 request — by agency, by program, and by what grows or gets cut.</p>
+  <hr class="toprule" />
+
+  <div class="bar">
+    <div class="tabs" id="tabs">
+      <button data-v="programs" class="on">All Programs</button>
+      <button data-v="agencies">Agency Totals</button>
+      <button data-v="dept">By Department</button>
+      <button data-v="changes">Changes</button>
+    </div>
+    <div class="fbar" id="fbar">
+      <button data-f="all" class="on">All</button>
+      <button data-f="grow">Increases</button>
+      <button data-f="cut">Cuts</button>
+    </div>
+  </div>
+
+  <div class="panel" id="panel">
+    <aside class="rail">
+      <div id="railtext"></div>
+      <div id="sizekey-wrap"><div class="key-h">Circles are sized by dollars.</div>
+        <svg id="sizekey" class="sizekey"></svg></div>
+      <div id="colorkey"></div>
+    </aside>
+    <div class="stage">
+      <p class="deptnote">Each panel is an agency, sized by its 2027 request. The circles inside are the programs the budget names, scaled within each agency and colored green for increases, red for cuts.</p>
+      <svg id="chart"></svg>
+    </div>
+  </div>
+
+  <footer>
+    <b>How to read it.</b> Color follows the budget's own framing: green where a line goes up, red where it comes down. <b>All Programs</b> floats every named increase to the top and sinks every cut to the bottom, each circle sized by its dollar change. <b>Agency Totals</b> sizes each agency by its 2027 base discretionary request and colors it by percent change from 2026. <b>By Department</b> nests the named programs inside their agency. <b>Changes</b> places each agency by its percent change.<br><br>
+    <b>Honest limits.</b> This summary volume gives agency toplines cleanly (Table S-3) but only the program changes its authors chose to highlight — not the full account-level tree, which lives in the Appendix and Analytical Perspectives volumes. A few figures are funding levels, multi-year financing, or mandatory funds rather than annual deltas; those are flagged in their tooltips. "Budget cites" text paraphrases the document's stated rationale, not an endorsement. Figures in $ millions unless noted. Source: OMB, <i>Budget of the U.S. Government, FY2027</i>. Form after the NYT's <i>Four Ways to Slice Obama's 2013 Budget Proposal</i>.
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const AG = [
+  {name:"Department of War", v:1450.0, p:1009.1, defense:true, note:"Base discretionary $1.1T; $1.5T total incl. mandatory. Adds a $350B request in new mandatory resources."},
+  {name:"Veterans Affairs", v:144.9, p:133.4},
+  {name:"Health & Human Services", v:110.5, p:125.8},
+  {name:"Education", v:76.5, p:78.8, note:"On a stated path to elimination; programs consolidated or moved to Labor."},
+  {name:"Housing & Urban Development", v:73.5, p:84.2},
+  {name:"Homeland Security", v:63.0, p:65.1, note:"vs. 2026 CR level; $190B multi-year WFTC funds sit outside this topline."},
+  {name:"Energy", v:53.9, p:53.0, note:"NNSA $32.8B + rest of DOE $21.1B. Topline rises while non-nuclear DOE falls ~11%."},
+  {name:"Justice", v:40.8, p:36.1},
+  {name:"State & International", v:35.6, p:51.1},
+  {name:"Transportation", v:26.6, p:25.1},
+  {name:"Agriculture", v:20.8, p:25.7},
+  {name:"NASA", v:18.8, p:24.4},
+  {name:"Interior", v:15.9, p:18.2},
+  {name:"Social Security Admin", v:12.7, p:12.7},
+  {name:"Treasury (domestic)", v:11.5, p:13.1},
+  {name:"Labor", v:9.9, p:13.3},
+  {name:"Commerce", v:9.2, p:10.4},
+  {name:"Corps of Engineers", v:4.9, p:6.8},
+  {name:"EPA", v:4.2, p:8.8},
+  {name:"National Science Foundation", v:4.0, p:8.8},
+  {name:"General Services Admin", v:0.4, p:-0.3, flat:true, note:"Net budget authority near zero; percent change not meaningful."},
+  {name:"Small Business Admin", v:0.3, p:1.0},
+];
+const PR = [
+  {n:"Reaching Rural America", a:"Agriculture", v:50, note:"Funds USDA reorganization; relocate HQ staff to regional hubs."},
+  {n:"NIFA Formula Grants", a:"Agriculture", v:-510, note:"Shift from formula grants to competitive awards."},
+  {n:"Rural Business Service", a:"Agriculture", v:-82, note:"Called duplicative of SBA rural support."},
+  {n:"Agricultural Marketing Service", a:"Agriculture", v:-61, note:"Ends recurring grant carve-outs."},
+  {n:"McGovern-Dole Food for Education", a:"Agriculture", v:-240, note:"International school-feeding food aid."},
+  {n:"Community Facilities Grant Earmarks", a:"Agriculture", v:-659, note:"Congressionally-directed facility grants."},
+  {n:"Trade Enforcement & Investment Accelerator", a:"Commerce", v:110},
+  {n:"Bureau of Industry & Security", a:"Commerce", v:215, note:"Largest in bureau history; export-control agents."},
+  {n:"NOAA Shipbuilding & Unmanned Systems", a:"Commerce", v:135},
+  {n:"Minority Business Development Agency", a:"Commerce", v:-47, note:"Eliminated."},
+  {n:"Economic Development Administration", a:"Commerce", v:-449},
+  {n:"NOAA Operations, Research & Grants", a:"Commerce", v:-1600, note:"Terminates climate and education grant programs."},
+  {n:"NIST", a:"Commerce", v:-993, note:"Eliminates the Manufacturing Extension Partnership."},
+  {n:"ITA — Global Markets", a:"Commerce", v:-150},
+  {n:"NTIA", a:"Commerce", v:-2200, note:"Cancels the Digital Equity program."},
+  {n:"Special Education (IDEA)", a:"Education", v:539},
+  {n:"Federal Pell Grants", a:"Education", v:10500, note:"To $33B; addresses funding shortfall, max award held at $6,335."},
+  {n:"Charter School Expansion", a:"Education", v:500},
+  {n:"K-12 Eliminations & Consolidations", a:"Education", v:-8500, note:"17 programs folded into MEGA grants; 12 eliminated."},
+  {n:"Career/Technical & Adult Ed (OCTAE)", a:"Education", v:-1500, note:"CTE moved to Labor; Adult Education eliminated."},
+  {n:"Higher Education Eliminations", a:"Education", v:-2700, note:"Incl. Minority-Serving Institutions, FIPSE, Int'l Education."},
+  {n:"Bolstering Energy Dominance", a:"Energy", v:4700, note:"Repurposes IIJA funds: $3.5B baseload + $1.2B AI supercomputers."},
+  {n:"Strengthening Nuclear Security (NNSA)", a:"Energy", v:3600},
+  {n:"Domestic Critical Minerals", a:"Energy", v:394},
+  {n:"Refilling the SPR", a:"Energy", v:89},
+  {n:"Energy-Water Security", a:"Energy", v:75},
+  {n:"Cancel IIJA 'Green New Scam' Funding", a:"Energy", v:-15200, note:"Cancellation of prior-year IIJA balances, not annual discretionary."},
+  {n:"Office of Science", a:"Energy", v:-1100, note:"Cuts climate research; keeps HPC, AI, fusion."},
+  {n:"Environmental Management", a:"Energy", v:-386},
+  {n:"ARPA-E", a:"Energy", v:-150},
+  {n:"MAHA: Health Center Nutrition", a:"Health & Human Services", v:19},
+  {n:"Nutrition & Food Safety", a:"Health & Human Services", v:57},
+  {n:"CDC Infection Prevention & Food Safety", a:"Health & Human Services", v:55},
+  {n:"Chronic Care Telehealth", a:"Health & Human Services", v:20},
+  {n:"Telehealth Nutrition Services", a:"Health & Human Services", v:8},
+  {n:"Tribal Prevention Innovation", a:"Health & Human Services", v:19},
+  {n:"LIHEAP", a:"Health & Human Services", v:-4000, note:"Low-income energy assistance; proposed for elimination (6th time)."},
+  {n:"Refugee Resettlement", a:"Health & Human Services", v:-768},
+  {n:"Unaccompanied Alien Children", a:"Health & Human Services", v:-819},
+  {n:"Community Services Block Grant", a:"Health & Human Services", v:-775},
+  {n:"AHA Consolidations", a:"Health & Human Services", v:-5000, note:"Merges programs from HRSA, SAMHSA, CDC, OASH."},
+  {n:"National Institutes of Health", a:"Health & Human Services", v:-5000, note:"Research to $41B; eliminates several institutes/centers."},
+  {n:"AHRQ", a:"Health & Human Services", v:-129},
+  {n:"ASPR", a:"Health & Human Services", v:-356, note:"Includes eliminating the Hospital Preparedness Program (−$240M)."},
+  {n:"Coast Guard Operations", a:"Homeland Security", v:2100, note:"Force Design 2028 expansion; man new WFTC-funded assets."},
+  {n:"Secret Service Protective Ops", a:"Homeland Security", v:36},
+  {n:"FEMA Non-Disaster Grants", a:"Homeland Security", v:-1300},
+  {n:"CISA", a:"Homeland Security", v:-707, note:"Refocus on network defense; cuts 'misinformation' and engagement offices."},
+  {n:"TSA Privatization", a:"Homeland Security", v:-52},
+  {n:"DHS HQ Consolidation", a:"Homeland Security", v:-53},
+  {n:"CWMD Reorganization", a:"Homeland Security", v:-40},
+  {n:"Program Integrity Initiative", a:"Housing & Urban Development", v:30},
+  {n:"Foster Youth to Independence", a:"Housing & Urban Development", v:5},
+  {n:"Community Development Block Grant", a:"Housing & Urban Development", v:-3300, note:"Proposed for elimination (6th time)."},
+  {n:"HOME Investment Partnerships", a:"Housing & Urban Development", v:-1300},
+  {n:"Homeless Assistance (CoC)", a:"Housing & Urban Development", v:-393, note:"Eliminates Continuum of Care; $4B Emergency Solutions Grant instead."},
+  {n:"Housing for Persons with AIDS (HOPWA)", a:"Housing & Urban Development", v:-529},
+  {n:"Native American / Hawaiian Housing", a:"Housing & Urban Development", v:-489},
+  {n:"PRO Housing", a:"Housing & Urban Development", v:-50},
+  {n:"Fair Housing Activities", a:"Housing & Urban Development", v:-60},
+  {n:"Housing Counseling", a:"Housing & Urban Development", v:-58},
+  {n:"Presidential Capital Stewardship", a:"Interior", v:10000, note:"A new mandatory fund for D.C. parks and beautification — not annual discretionary."},
+  {n:"Great Salt Lake Restoration", a:"Interior", v:1000},
+  {n:"Renewable Energy Programs", a:"Interior", v:-45, note:"Eliminates DOI 'renewable energy' programs."},
+  {n:"Immigration Enforcement (EOIR)", a:"Justice", v:99},
+  {n:"Combats Violent Crime in Cities", a:"Justice", v:3000, note:"$22.2B total to surge enforcement into high-crime areas."},
+  {n:"DEA / Anti-Cartel", a:"Justice", v:362, note:"300+ new DEA agents."},
+  {n:"National Fraud Division", a:"Justice", v:30},
+  {n:"2nd Amendment / Civil Rights", a:"Justice", v:8},
+  {n:"Bureau of Prisons / Restore Alcatraz", a:"Justice", v:1700, note:"$152M first-year cost to rebuild Alcatraz."},
+  {n:"FBI Salaries & Expenses", a:"Justice", v:1900, note:"To $12.5B."},
+  {n:"State/Local Grant Programs", a:"Justice", v:-1700, note:"~30 grant programs cut."},
+  {n:"Community Relations Svc / Access to Justice", a:"Justice", v:-20, note:"Both offices eliminated."},
+  {n:"Job Corps", a:"Labor", v:-1600, note:"Eliminated; document cites violence and cost-per-graduate."},
+  {n:"Senior Community Service Employment", a:"Labor", v:-395},
+  {n:"Worker Protection Agencies", a:"Labor", v:-234, note:"Includes OSHA's Susan Harwood training grants."},
+  {n:"Federal Contract Compliance (OFCCP)", a:"Labor", v:-101},
+  {n:"International Labor Affairs (ILAB)", a:"Labor", v:-46},
+  {n:"America First Opportunity Fund", a:"State & International", v:5000, note:"New flexible foreign-policy fund."},
+  {n:"Critical Minerals (multi-agency)", a:"State & International", v:13000, note:"Financing and resources spanning several departments — not State discretionary alone."},
+  {n:"Foreign Military Financing", a:"State & International", v:5300, note:"$5.3B grant/subsidy plus $18B in loan authority."},
+  {n:"Humanitarian Assistance", a:"State & International", v:-2000},
+  {n:"Food for Peace (Title II)", a:"State & International", v:-1200},
+  {n:"Global Health Programs", a:"State & International", v:-4300, note:"To $5.1B; eliminates disease-specific accounts (PEPFAR, etc.)."},
+  {n:"International Organizations & UN", a:"State & International", v:-2700, note:"Cuts UN regular budget and peacekeeping; zero for WHO."},
+  {n:"Treasury International", a:"State & International", v:-642, note:"Rescissions incl. African Dev. Fund, Global Environment Facility."},
+  {n:"National Endowment for Democracy", a:"State & International", v:-315, note:"Eliminated."},
+  {n:"Treasury Departmental Offices", a:"Treasury (domestic)", v:13.7},
+  {n:"Terrorism & Financial Intelligence", a:"Treasury (domestic)", v:15.2},
+  {n:"CDFI Fund", a:"Treasury (domestic)", v:-204.5},
+  {n:"Internal Revenue Service", a:"Treasury (domestic)", v:-1400, note:"Streamlines operations; Direct File closed; workforce down 27%."},
+  {n:"Medical Care", a:"Veterans Affairs", v:10600, note:"Discretionary + mandatory; total medical care $175.5B."},
+  {n:"Electronic Health Record Modernization", a:"Veterans Affairs", v:800},
+  {n:"IT Systems", a:"Veterans Affairs", v:389},
+  {n:"Veterans Benefits Admin (AI/automation)", a:"Veterans Affairs", v:130},
+  {n:"DEI / 'Woke' Program Reductions", a:"Department of War", v:-1600, note:"Sustains reductions the Administration says it has identified. Most War increases are stated as funding levels, so they sit in the agency topline."},
+  {n:"Permitting Tools (NEPAssist)", a:"EPA", v:14},
+  {n:"Drinking Water", a:"EPA", v:7},
+  {n:"Atmospheric Protection Program", a:"EPA", v:-100},
+  {n:"State Revolving Funds", a:"EPA", v:-2500},
+  {n:"Categorical Grants", a:"EPA", v:-1000},
+  {n:"Diesel Emissions Reduction (DERA)", a:"EPA", v:-90},
+  {n:"Artemis / Moon Landing", a:"NASA", v:731, note:"$8.5B Artemis; crewed lunar landing targeted by end of 2028."},
+  {n:"Lunar Base Camp", a:"NASA", v:175},
+  {n:"Science", a:"NASA", v:-3400, note:"Terminates 40+ missions incl. Mars Sample Return."},
+  {n:"Space Technology", a:"NASA", v:-297},
+  {n:"International Space Station", a:"NASA", v:-1100, note:"Wind-down toward safe de-orbit in 2030."},
+  {n:"STEM Engagement", a:"NASA", v:-143},
+  {n:"Big, Beautiful Infrastructure", a:"Transportation", v:1300},
+  {n:"FAA Operations & Capital", a:"Transportation", v:481},
+  {n:"Maritime Action Plan (DOT)", a:"Transportation", v:1500},
+  {n:"D.C. Safe & Beautiful Transport", a:"Transportation", v:403},
+  {n:"Transit Capital Investment Grants", a:"Transportation", v:-486},
+  {n:"EV Charger Subsidies (NEVI)", a:"Transportation", v:-4200, note:"Cancels unobligated IIJA EV-charging funds."},
+  {n:"Essential Air Service", a:"Transportation", v:-372},
+  {n:"RAISE Grants", a:"Transportation", v:-145, note:"Defunds program for using 'climate/equity' selection criteria."},
+  {n:"Entrepreneurial Development Programs", a:"Small Business Admin", v:-309, note:"Eliminates SCORE and Community Navigator; keeps $21.4M for veterans."},
+  {n:"Salaries & Expenses", a:"Small Business Admin", v:-170},
+  {n:"Business Loan Admin Expenses", a:"Small Business Admin", v:-158, note:"Proposes a new fee on participating lenders."},
+];
+
+AG.forEach(d=>{ d.pct = d.flat ? null : (d.v-d.p)/d.p*100; });
+const agByName = Object.fromEntries(AG.map(d=>[d.name,d]));
+
+// ---- NYT's exact 7-bucket diverging palette + matched label tints ----
+//   index 0..6  =  deepest cut … no change … deepest increase
+const FILL  =["#d84b2a","#ee9586","#e4b7b2","#cccccc","#beccae","#9caf84","#7aa25c"];
+const LABELC=["#eeb0a2","#f8d0ca","#f3dfdd","#ffffff","#e2e8db","#d3dbc9","#c5d6b7"];
+const POSMAX = d3.max(PR.filter(p=>p.v>0),p=>p.v);
+const NEGMAX = -d3.min(PR.filter(p=>p.v<0),p=>p.v);
+function bucketAg(d){ if(d.pct==null) return 3; const p=d.pct;
+  if(p<=-25)return 0; if(p<=-5)return 1; if(p<0)return 2; if(p===0)return 3;
+  if(p<=5)return 4; if(p<=25)return 5; return 6; }
+function bucketPr(v){ if(v<0){const t=Math.sqrt(-v/NEGMAX); return t>0.66?0:t>0.33?1:2;}
+  const t=Math.sqrt(v/POSMAX); return t>0.66?6:t>0.33?5:4; }
+
+const svg=d3.select("#chart"), tip=d3.select("#tip");
+let view="programs", filter="all", W=900, H=620, lastR=null, lastMax=null;
+const sim=d3.forceSimulation().alphaDecay(.02).on("tick",ticked);
+let bubSel=null;
+
+function passPr(p){ return filter==="all"||(filter==="grow"&&p.v>0)||(filter==="cut"&&p.v<0); }
+function passAg(d){ if(filter==="all")return true; if(d.pct==null)return false;
+  return filter==="grow"?d.pct>0:d.pct<0; }
+
+function rscale(values,Rmax){ const m=d3.max(values); lastR=v=>Math.sqrt(v/m)*Rmax; lastMax=m; return lastR; }
+function short(s){return s.replace("Department of ","").replace(" Administration","").replace(" & ","/").replace(" and ","/");}
+function luminance(hex){const c=d3.color(hex);return c?(0.299*c.r+0.587*c.g+0.114*c.b):200;}
+
+function fmtM(v){const a=Math.abs(v),s=v<0?"−":"+";
+  if(a>=1000)return s+"$"+(a/1000).toFixed(a>=10000?0:2).replace(/\.?0+$/,"")+"B";
+  return s+"$"+(a%1===0?a:a.toFixed(1))+"M";}
+function fmtB(v){return "$"+(v>=100?v.toFixed(0):v.toFixed(1))+"B";}
+
+function measure(){ W=Math.max(320,document.querySelector(".stage").clientWidth); }
+
+function render(){
+  measure();
+  document.getElementById("panel").classList.toggle("full",view==="dept");
+  sim.stop(); svg.selectAll("*").remove(); bubSel=null;
+  if(view==="programs") packView(PR.filter(passPr),p=>Math.abs(p.v),p=>bucketPr(p.v),p=>p.v,"program");
+  else if(view==="agencies") packView(AG.filter(passAg),d=>d.v,bucketAg,d=>(d.pct==null?0:d.pct),"agency");
+  else if(view==="changes") changesView();
+  else if(view==="dept") deptView();
+  updateRail();
+}
+
+function packView(data,sizeF,bucketF,sortF,kind){
+  H=Math.round(Math.min(760,Math.max(520,W*0.66)));
+  svg.attr("viewBox",`0 0 ${W} ${H}`).attr("height",H);
+  const dim=Math.min(W,H);
+  const Rmax=(kind==="agency"?0.215:0.15)*dim;
+  const r=rscale(data.map(sizeF),Rmax);
+  const sv=data.map(sortF), smin=d3.min(sv), smax=d3.max(sv);
+  const ys=d3.scaleLinear().domain([smin,smax||1]).range([H*0.9,H*0.12]);
+  const nodes=data.map(d=>{const bk=bucketF(d);
+    return {d,kind,r:Math.max(kind==="agency"?7:4.5,r(sizeF(d))),
+    bucket:bk, color:FILL[bk], val:d.v, sort:sortF(d),
+    x:W/2+(Math.random()-.5)*60, y:ys(sortF(d))+(Math.random()-.5)*40};});
+
+  // annotations
+  svg.append("text").attr("class","anno").attr("x",W-6).attr("y",H*0.085)
+     .attr("text-anchor","end").text("Largest increases");
+  svg.append("text").attr("class","anno").attr("x",W-6).attr("y",H-8)
+     .attr("text-anchor","end").text("Largest cuts");
+
+  drawBubbles(nodes,kind);
+  sim.nodes(nodes)
+    .force("x",d3.forceX(W/2).strength(.035))
+    .force("y",d3.forceY(d=>ys(d.sort)).strength(.085))
+    .force("collide",d3.forceCollide(d=>d.r+1.5).iterations(3))
+    .alpha(.95).restart();
+}
+
+function changesView(){
+  H=Math.round(Math.min(720,Math.max(480,W*0.6)));
+  svg.attr("viewBox",`0 0 ${W} ${H}`).attr("height",H);
+  const data=AG.filter(passAg).filter(d=>d.pct!=null);
+  const padT=30,padB=28,padL=46;
+  const ys=d3.scaleLinear().domain([-72,46]).range([H-padB,padT]).clamp(true);
+  const r=rscale(data.map(d=>d.v),H*0.072);
+  const ticks=[44,25,15,5,0,-5,-15,-25,-40,-55,-70];
+  ticks.forEach(t=>{
+    const y=ys(t);
+    svg.append("line").attr("class","gridline"+(t===0?" zero":"")).attr("x1",padL).attr("x2",W).attr("y1",y).attr("y2",y);
+    svg.append("text").attr("class","gridlab").attr("x",padL-6).attr("y",y+3).attr("text-anchor","end")
+       .text((t>0?"+":"")+t+"%"+(t===44?"":""));
+  });
+  const nodes=data.map(d=>{const bk=bucketAg(d);
+    return {d,kind:"agency",r:Math.max(5,r(d.v)),bucket:bk,color:FILL[bk],val:d.v,
+    x:(padL+W)/2+(Math.random()-.5)*80, y:ys(d.pct)};});
+  drawBubbles(nodes,"changes");
+  sim.nodes(nodes)
+    .force("x",d3.forceX((padL+W)/2).strength(.04))
+    .force("y",d3.forceY(d=>ys(d.d.pct)).strength(.32))
+    .force("collide",d3.forceCollide(d=>d.r+1.3).iterations(3))
+    .alpha(.95).restart();
+}
+
+function deptView(){
+  const present=AG.filter(a=>PR.some(p=>p.a===a.name&&passPr(p))).slice().sort((a,b)=>b.v-a.v);
+  const maxReq=d3.max(present,d=>d.v);
+  const margin=10, labelSpace=30, gap=30;
+  const panelMax=Math.min(118,W*0.105), panelMin=24;
+  const PR_=p=>Math.max(panelMin,Math.sqrt(p.v/maxReq)*panelMax);
+  rscale([maxReq],panelMax); // for size key
+
+  // greedy row wrap
+  const rows=[]; let row=[],rw=0;
+  present.forEach(a=>{const d=2*PR_(a)+gap; if(rw+d>W-2*margin && row.length){rows.push(row);row=[];rw=0;} row.push(a); rw+=d;});
+  if(row.length)rows.push(row);
+
+  let y=6; const place=[];
+  rows.forEach(r=>{
+    const rmax=d3.max(r,PR_);
+    const totalW=r.reduce((s,a)=>s+2*PR_(a)+gap,0)-gap;
+    let x=margin+Math.max(0,((W-2*margin)-totalW)/2);
+    r.forEach(a=>{const R=PR_(a); place.push({a,R,cx:x+R,cy:y+labelSpace+rmax}); x+=2*R+gap;});
+    y+=labelSpace+2*rmax+gap;
+  });
+  H=y+6; svg.attr("viewBox",`0 0 ${W} ${H}`).attr("height",H);
+
+  const all=[];
+  place.forEach(({a,R,cx,cy})=>{
+    const progs=PR.filter(p=>p.a===a.name&&passPr(p)).map(p=>({...p,value:Math.abs(p.v)}));
+    const root=d3.hierarchy({children:progs}).sum(d=>d.value);
+    d3.pack().size([2*R,2*R]).padding(1.4)(root);
+    const g=svg.append("g");
+    g.selectAll("circle").data(root.leaves()).join("circle")
+      .attr("class","bub")
+      .attr("cx",l=>cx-R+l.x).attr("cy",l=>cy-R+l.y).attr("r",l=>l.r)
+      .attr("fill",l=>FILL[bucketPr(l.data.v)])
+      .on("mousemove",(e,l)=>showTip(e,{kind:"program",d:l.data}))
+      .on("mouseenter",(e,l)=>showTip(e,{kind:"program",d:l.data}))
+      .on("mouseleave",()=>tip.style("opacity",0));
+    svg.append("text").attr("class","panlab-v").attr("x",cx).attr("y",cy-R-15).attr("text-anchor","middle")
+       .text(a.v>=1? fmtB(a.v):("$"+Math.round(a.v*1000)+"M"));
+    svg.append("text").attr("class","panlab-n").attr("x",cx).attr("y",cy-R-3).attr("text-anchor","middle")
+       .text(short(a.name));
+  });
+}
+
+// Sizes a label to ALWAYS fit inside its circle: tries the largest font that
+// fits on one line, then two balanced lines, else hides the label entirely.
+function fitLabel(node, name, r){
+  const sel=d3.select(node);
+  sel.selectAll("tspan").remove(); sel.text("");
+  if(r<9) return;
+  const maxFS=Math.min(17, r*0.95), minFS=8;
+  const words=name.split(/\s+/);
+  const chord=ye=>{const i=r*r-ye*ye; return i>0?2*Math.sqrt(i)*0.86:0;};
+  function lineSets(n){
+    if(n===1) return [[name]];
+    if(words.length<2) return [];
+    let best=null,bs=1e9;
+    for(let k=1;k<words.length;k++){
+      const a=words.slice(0,k).join(" "),b=words.slice(k).join(" ");
+      const s=Math.max(a.length,b.length);
+      if(s<bs){bs=s;best=[a,b];}
+    }
+    return best?[best]:[];
+  }
+  function fits(lines,fs){
+    sel.style("font-size",fs+"px").text(null).selectAll("tspan").remove();
+    const n=lines.length; let ok=true;
+    lines.forEach((ln,i)=>{
+      const cy=(i-(n-1)/2)*fs*1.04;
+      const ts=sel.append("tspan").attr("x",0).attr("y",cy).text(ln);
+      const ye=Math.abs(cy)+fs*0.55;
+      if(ts.node().getComputedTextLength()>chord(ye)) ok=false;
+    });
+    return ok;
+  }
+  for(const n of [1,2]){
+    for(const lines of lineSets(n)){
+      for(let fs=Math.floor(maxFS); fs>=minFS; fs--){
+        if(fits(lines,fs)) return;
+      }
+    }
+  }
+  sel.selectAll("tspan").remove(); sel.text("");
+}
+
+function drawBubbles(nodes,kind){
+  bubSel=svg.append("g").selectAll("g.node").data(nodes).join("g").attr("class","node");
+  bubSel.append("circle").attr("class","bub").attr("r",d=>d.r).attr("fill",d=>d.color)
+    .attr("fill-opacity",kind==="agency"?1:0.94);
+  if(kind!=="changes"){
+    bubSel.append("text").attr("class","blab")
+      .attr("text-anchor","middle").attr("dominant-baseline","central")
+      .attr("fill",d=>LABELC[d.bucket])
+      .each(function(d){ fitLabel(this, short(d.d.name||d.d.n), d.r); });
+  }
+  bubSel
+    .on("mousemove",(e,d)=>showTip(e,d))
+    .on("mouseenter",(e,d)=>showTip(e,d))
+    .on("mouseleave",()=>tip.style("opacity",0));
+}
+
+function ticked(){ if(bubSel) bubSel.attr("transform",d=>`translate(${d.x},${d.y})`); }
+
+function showTip(e,node){
+  const kind=node.kind, d=node.d;
+  let html="";
+  if(kind==="agency"){
+    const dir=d.pct==null?"":(d.pct>0?"up":"down");
+    const pct=d.pct==null?"n/a":(d.pct>0?"+":"")+d.pct.toFixed(1)+"%";
+    html=`<div class="th">${d.name}${d.defense?" · defense":""}</div><div class="thr"></div>
+      <div class="tn">${d.name}</div><div class="tsub">2027 base request</div>
+      <div><span class="tbig">${fmtB(d.v)}</span> &nbsp;<span class="tpct ${dir}">${pct}</span></div>`;
+    if(d.note)html+=`<div class="tnote"><b>Note</b>${d.note}</div>`;
+  } else {
+    const dir=d.v<0?"down":"up";
+    html=`<div class="th">${d.a}</div><div class="thr"></div>
+      <div class="tn">${d.n}</div><div class="tsub">change vs. 2026</div>
+      <div><span class="tbig ${dir==='down'?'':''}" style="color:${d.v<0?'var(--redtxt)':'var(--greentxt)'}">${fmtM(d.v)}</span></div>`;
+    if(d.note)html+=`<div class="tnote"><b>Budget cites</b>${d.note}</div>`;
+  }
+  tip.html(html).style("opacity",1);
+  const tw=tip.node().offsetWidth, th=tip.node().offsetHeight;
+  let x=e.clientX+16, y=e.clientY+16;
+  if(x+tw>innerWidth-12)x=e.clientX-tw-16;
+  if(y+th>innerHeight-12)y=e.clientY-th-16;
+  tip.style("left",x+"px").style("top",y+"px");
+}
+
+// ---- rail / legends ----
+const RAILTEXT={
+  programs:["Every Program the Budget Names","Each circle is a single increase or cut the FY2027 chapters call out, sized by the dollar change. Increases rise to the top, cuts sink to the bottom."],
+  agencies:["How the Request Splits by Agency","Each circle is an agency's 2027 base discretionary request, sized by dollars and colored by its change from the 2026 level."],
+  changes:["Changes by Agency","Vertical position is each agency's percent change from 2026. Circle size is the 2027 request. Defense rises; most domestic agencies fall."],
+  dept:["",""]
+};
+function updateRail(){
+  const rt=document.getElementById("railtext");
+  const [h,p]=RAILTEXT[view];
+  rt.innerHTML = view==="dept"?"":`<h3>${h}</h3><p>${p}</p>`;
+  // size key
+  const skWrap=document.getElementById("sizekey-wrap");
+  skWrap.style.display = view==="dept"?"none":"block";
+  drawSizeKey();
+  // color key
+  const ck=document.getElementById("colorkey");
+  if(view==="dept"){ ck.innerHTML=""; return; }
+  if(view==="programs"){
+    ck.innerHTML=`<div class="key-h">Color shows direction and size of the change.</div>
+      <div class="ramp-wrap"><div class="ramp">
+        ${FILL.map(c=>`<i style="background:${c}"></i>`).join("")}</div>
+        <div class="ramp-ticks"><span style="left:7%">bigger cut</span><span style="left:50%">no change</span><span style="left:93%">bigger increase</span></div>
+      </div>`;
+  } else {
+    const ramp=FILL.map(c=>`<i style="background:${c}"></i>`).join("");
+    ck.innerHTML=`<div class="key-h">Color shows cut or increase from 2026.</div>
+      <div class="ramp-wrap"><div class="ramp">${ramp}</div>
+        <div class="ramp-ticks"><span style="left:14%">−25%</span><span style="left:29%">−5%</span>
+        <span style="left:50%">0</span><span style="left:71%">+5%</span><span style="left:86%">+25%</span></div></div>`;
+  }
+}
+function drawSizeKey(){
+  const sk=d3.select("#sizekey"); sk.selectAll("*").remove();
+  if(!lastR||view==="dept"){sk.attr("height",0);return;}
+  let vals;
+  if(view==="agencies") vals=[1000,100,10];
+  else if(view==="changes") vals=[1000,100,10];
+  else vals=[10000,1000,100];
+  const rr=vals.map(v=>Math.max(2,lastR(v)));
+  const maxR=rr[0], by=2*maxR+4, cx=maxR+2, h=by+8;
+  sk.attr("width",230).attr("height",h);
+  // labels: programs use $M-scale, agencies/changes use $B-scale
+  const label = v => view==="programs"
+        ? (v>=1000 ? "$"+(v/1000)+"B" : "$"+v+"M")
+        : (v>=1000 ? "$"+(v/1000)+"T" : "$"+v+"B");
+  vals.forEach((v,i)=>{
+    const r=rr[i];
+    sk.append("circle").attr("cx",cx).attr("cy",by-r).attr("r",r)
+      .attr("fill","none").attr("stroke","#bbb").attr("stroke-dasharray","2 3");
+    sk.append("line").attr("x1",cx).attr("x2",maxR*2+18).attr("y1",by-2*r).attr("y2",by-2*r)
+      .attr("stroke","#e2e2e2");
+    sk.append("text").attr("x",maxR*2+22).attr("y",by-2*r+3).attr("font-size",11)
+      .attr("fill","#888").text(label(v));
+  });
+}
+
+// controls
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); view=b.dataset.v; render();
+});
+document.querySelectorAll("#fbar button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#fbar button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); filter=b.dataset.f; render();
+});
+let rt; addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,180);});
+render();
+</script>
